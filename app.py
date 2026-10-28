@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 import plotly.express as px
-from ai_report import make_report
+from ai_report import make_report, ask_question
 from build_db import build
 build()
 
@@ -47,3 +47,18 @@ if st.button("Generate AI Report"):
     report,usage=make_report(weather_data)
     st.write(report)
     st.write(usage.total_tokens)
+
+if "messages" not in st.session_state:
+    st.session_state.messages=[]
+
+question=st.chat_input("Ask about the weather")
+if question:
+    st.session_state.messages.append({"role":"user","content":question})
+    try:
+        answer=ask_question(filtered.tail(50),st.session_state.messages)
+    except Exception:
+        answer="Sorry, the chat is not available right now."
+    st.session_state.messages.append({"role":"assistant","content":answer})
+
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
