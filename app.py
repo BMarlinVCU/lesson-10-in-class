@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 import plotly.express as px
-
+from ai_report import make_report
 from build_db import build
 build()
 
@@ -39,3 +39,11 @@ st.plotly_chart(fig,use_container_width=True)
 
 st.text("This is my dataframe")
 st.dataframe(df_weather)#shows data frame
+
+if st.button("Generate AI Report"):
+    weather_data=filtered.tail(50)
+    st.subheader("AI Weather Report")
+
+    report,usage=make_report(weather_data)
+    st.write(report)
+    st.write(usage.total_tokens)
